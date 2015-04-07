@@ -1,3 +1,5 @@
+package app;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -21,7 +23,7 @@ public class NodeSender {
             InetAddress address = InetAddress.getByName(ipAddress);
             DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
             myUDPSocket.send(packet);
-            System.out.println("To Node: " + packet.getAddress().toString() + ":" + packet.getPort() + ":- " + message);
+            System.out.println("To app.Node: " + packet.getAddress().toString() + ":" + packet.getPort() + ":- " + message);
 
         } catch (SocketException e) {
             e.printStackTrace();

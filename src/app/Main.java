@@ -1,3 +1,7 @@
+package app;
+
+import webservice.FileServicePublisher;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +17,10 @@ public class Main {
 
         Node.setupFiles();
         Node.registerWithBS();
+
+        //publish service
+        FileServicePublisher fsp = new FileServicePublisher();
+        fsp.publish();
 
         DatagramSocket myUDPSocket = new DatagramSocket(Util.PORT); //the port used for all UDP communication
 
@@ -40,7 +48,7 @@ public class Main {
                                 System.out.println("Similar file available locally: " + name);
                             }
                             System.out.println("Sending the file search query to distributed system");
-                            Node.searchFile(myUDPSocket, filename);
+                            Node.searchFile(filename);
                         }
                         break;
                     case 3:

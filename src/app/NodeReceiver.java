@@ -1,5 +1,8 @@
+package app;
+
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
 /**
  * Created by Tharindu Wijewardane on 2015-03-06.
@@ -11,7 +14,7 @@ public class NodeReceiver {
      *
      * @param myUDPSocket DatagramSocket used
      * @return
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static DatagramPacket receiveUDP(DatagramSocket myUDPSocket) throws IOException {
 
@@ -19,7 +22,7 @@ public class NodeReceiver {
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         myUDPSocket.receive(packet);
         String received = new String(packet.getData(), 0, packet.getLength());
-        System.out.println("From Node " + packet.getAddress().toString() + ":" + packet.getPort() + ":- " + received);
+        System.out.println("From app.Node " + packet.getAddress().toString() + ":" + packet.getPort() + ":- " + received);
 
         return packet;
     }

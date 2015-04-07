@@ -3,16 +3,12 @@ How to setup and run:
 
 1.) Copy java files to any number of machines
 
-2.) Open the Util.java file and change the values of IP, PORT, USERNAME according to the machine.
+2.) Open the Util.java file and change the values of IP, PORT, USERNAME according to the machine. Each node publishes a web service on the next port to the PORT value in Util.java(ie: PORT+1). Therefore make sure the next port is free when choosing a value for PORT.
 	Change BS_IP, BS_PORT according to the machine running the Bootstrap server
 
 3.) Start Bootstrap server on chosen port in the chosen machine
 
-4.) Compile and Run the java files on each machine:
-
-javac Main.java Node.java BootstrapCommunicator.java NodeSender.java NodeReceiver.java Neighbour.java Util.java
-
-java Main
+4.) Compile and Run the java files on each machine
 
 *******************************************************************************************************
 
