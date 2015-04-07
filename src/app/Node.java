@@ -1,3 +1,8 @@
+package app;
+
+import webservice.FileService;
+import webservice.FileServiceInterface;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,7 +26,7 @@ public class Node {
      * @param query
      * @return
      */
-    static boolean checkInRecentQueries(String query) {
+    public static boolean checkInRecentQueries(String query) {
 
         if (recentSearchQueries.contains(query)) {
             return true;
@@ -49,27 +54,27 @@ public class Node {
      * @param filename
      * @return
      */
-    static HashSet<String> checkForFileAvailability(String filename) {
+    public static HashSet<String> checkForFileAvailability(String filename) {
         HashSet<String> availableFileNames = new HashSet<String>();
         String[] words = filename.split(" ");
 
         for (String file : localFiles) {
             for (int i = 0; i < words.length; i++) {
-                if (file.contains(words[i] + " ") || file.contains(" " + words[i])) {
+                if (file.contains(words[i] + " ") || file.contains(" " + words[i]) || file.equals(words[i])) {
                     availableFileNames.add(file);
                 }
             }
         }
+
         return availableFileNames;
     }
 
     /**
      * Send a search query to neighbouring nodes
      *
-     * @param myUDPSocket
      * @param filename
      */
-    static void searchFile(DatagramSocket myUDPSocket, String filename) {
+    static void searchFile(String filename) {
 
         String basicQuery = "SER " + Util.IP + " " + Util.PORT + " " + filename;
         checkInRecentQueries(basicQuery); // just to add the entry
@@ -77,26 +82,25 @@ public class Node {
         int hopCount = 4; //TODO decide a value for initial hop count
 
         for (Neighbour neighbour : neighbours) {
-            NodeSender.sendUDP(myUDPSocket, Util.formMessage("SER " + Util.IP + " " + Util.PORT + " " + filename + " " + hopCount),
-                    neighbour.ipAddress, neighbour.port);
+//            app.NodeSender.sendUDP(myUDPSocket, app.Util.formMessage("SER " + app.Util.IP + " " + app.Util.PORT + " " + filename + " " + hopCount),
+//                    neighbour.ipAddress, neighbour.port);
+            FileServiceInterface fs = neighbour.getFileService();
+            fs.searchFile(filename, Util.IP, Util.PORT, hopCount);
+
         }
     }
 
     /**
      * Forward a search query to neighbouring nodes.
      *
-     * @param myUDPSocket
      * @param searcherIp
      * @param searcherPort
      * @param filename
      * @param hops
      */
-    static void forwardSearchRequest(DatagramSocket myUDPSocket, String searcherIp, int searcherPort, String filename, int hops) {
-
+    public static void forwardSearchRequest(String searcherIp, int searcherPort, String filename, int hops) {
         for (Neighbour neighbour : neighbours) {
-            NodeSender.sendUDP(myUDPSocket, Util.formMessage("SER " + searcherIp + " " + searcherPort + " " + filename + " " + hops),
-                    neighbour.ipAddress, neighbour.port);
-
+            neighbour.getFileService().searchFile(filename,searcherIp,searcherPort,hops);
         }
     }
 
@@ -215,77 +219,6 @@ public class Node {
 
                     case "9999": // error
                         break;
-                }
-
-            } else if (keyword.equalsIgnoreCase("SER")) { // received search request
-
-                String searcherIp = st.nextToken();
-                int searcherPort = Integer.parseInt(st.nextToken());
-
-                String filename = ""; // filename sent by searcher
-                String lastToken = "";
-                while (st.hasMoreTokens()) {
-                    filename += lastToken;
-                    lastToken = st.nextToken() + " ";
-                }
-                filename = filename.substring(0, filename.length() - 1); // strip space at end
-                lastToken = lastToken.substring(0, lastToken.length() - 1); // strip space at end
-
-                int hops = Integer.parseInt(lastToken);
-                hops = hops - 1; // decrement hop count
-
-                String basicQuery = "SER " + searcherIp + " " + searcherPort + " " + filename;
-                if (checkInRecentQueries(basicQuery)) {
-                    System.out.println("query discarded");
-                    return;
-                }
-
-                HashSet<String> availableFileNames = checkForFileAvailability(filename);
-                int numberOfFiles = availableFileNames.size();
-
-                if (numberOfFiles > 0) { // if i have similar files
-
-                    String fileString = "";
-                    for (String s : availableFileNames) {
-                        s = s.replace(" ", "_"); // replace spaces in filename with underscore
-                        fileString += s + " ";
-                    }
-                    fileString = fileString.substring(0, fileString.length() - 1); // strip last space
-
-                    NodeSender.sendUDP(myUDPSocket, Util.formMessage("SEROK " + numberOfFiles + " "
-                            + Util.IP + " " + Util.PORT + " " + hops + " " + fileString), searcherIp, searcherPort);
-
-                } else { // if i don't have
-
-                    NodeSender.sendUDP(myUDPSocket, Util.formMessage("SEROK 0 "
-                            + Util.IP + " " + Util.PORT + " " + hops + " " + filename), searcherIp, searcherPort);
-
-                    if (hops > 0) { // forward the search request to other nodes
-                        forwardSearchRequest(myUDPSocket, searcherIp, searcherPort, filename, hops);
-                    }
-                }
-
-            } else if (keyword.equalsIgnoreCase("SEROK")) { // received response to search request
-
-                int numberOfFiles = Integer.parseInt(st.nextToken());
-                if (numberOfFiles > 0) {
-                    String locatedIp = st.nextToken(); // ip of the node which has the file
-                    int locatedPort = Integer.parseInt(st.nextToken());
-                    int hops = Integer.parseInt(st.nextToken());
-
-                    while (st.hasMoreTokens()) {
-                        System.out.println("File found: " + st.nextToken() + " in " + locatedIp);
-                    }
-                } else {
-                    switch (numberOfFiles) {
-                        case 0:
-                            System.out.println("file not found in node");
-                            break;
-                        case 9999: // failure due to node unreachable
-                            break;
-                        case 9998: // some other error
-                            break;
-                    }
                 }
 
             }
