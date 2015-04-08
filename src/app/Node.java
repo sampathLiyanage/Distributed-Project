@@ -26,7 +26,7 @@ public class Node {
      * @param query
      * @return
      */
-    public static boolean checkInRecentQueries(String query) {
+    public static boolean checkInRecentQueries(final String query) {
 
         if (recentSearchQueries.contains(query)) {
             return true;
@@ -131,7 +131,7 @@ public class Node {
      *
      * @param myUDPSocket
      */
-    static void joinDistributedSystem(DatagramSocket myUDPSocket) {
+    static void joinDistributedSystem(final DatagramSocket myUDPSocket) {
 
         receiver = new Thread() {
             @Override
@@ -252,6 +252,7 @@ public class Node {
                         break;
 
                     // even though the sever sends multiple neighbours (due to a bug in server), first 2 are taken
+
                     case "4":
                     case "5":
                     case "6":
@@ -269,7 +270,7 @@ public class Node {
                     case "18":
                     case "19":
                     case "20":
-					case "3":
+                    case "3":
                         List<Neighbour> obtainedNeighbours = new ArrayList<Neighbour>();
                         while ((st.hasMoreTokens())) {
                             Neighbour n = new Neighbour(st.nextToken(), Integer.parseInt(st.nextToken()));
