@@ -1,6 +1,5 @@
 package app;
 
-import webservice.FileService;
 import webservice.FileServiceInterface;
 
 import java.io.IOException;
@@ -12,6 +11,8 @@ import java.util.*;
  * Created by Tharindu Wijewardane on 2015-03-03.
  */
 public class Node {
+
+    public static GUI gui;
 
     static ArrayList<String> localFiles = new ArrayList<String>();
     static HashSet<Neighbour> neighbours = new HashSet<Neighbour>(); // routing table
@@ -26,7 +27,7 @@ public class Node {
      * @param query
      * @return
      */
-    public static boolean checkInRecentQueries(final String query) {
+    public static boolean checkInRecentQueries(String query) {
 
         if (recentSearchQueries.contains(query)) {
             return true;
@@ -65,16 +66,16 @@ public class Node {
                 }
             }
         }
-
         return availableFileNames;
     }
 
     /**
      * Send a search query to neighbouring nodes
      *
+     * @param myUDPSocket
      * @param filename
      */
-    static void searchFile(String filename) {
+    static void searchFile(DatagramSocket myUDPSocket, String filename) {
 
         String basicQuery = "SER " + Util.IP + " " + Util.PORT + " " + filename;
         checkInRecentQueries(basicQuery); // just to add the entry
@@ -82,11 +83,7 @@ public class Node {
         int hopCount = 4; //TODO decide a value for initial hop count
 
         for (Neighbour neighbour : neighbours) {
-//            app.NodeSender.sendUDP(myUDPSocket, app.Util.formMessage("SER " + app.Util.IP + " " + app.Util.PORT + " " + filename + " " + hopCount),
-//                    neighbour.ipAddress, neighbour.port);
-            FileServiceInterface fs = neighbour.getFileService();
-            fs.searchFile(filename, Util.IP, Util.PORT, hopCount);
-
+            neighbour.getFileService().searchFile(filename, Util.IP, Util.PORT, hopCount);
         }
     }
 
@@ -131,7 +128,7 @@ public class Node {
      *
      * @param myUDPSocket
      */
-    static void joinDistributedSystem(final DatagramSocket myUDPSocket) {
+    static void joinDistributedSystem(DatagramSocket myUDPSocket) {
 
         receiver = new Thread() {
             @Override
@@ -221,6 +218,32 @@ public class Node {
                         break;
                 }
 
+            }  else if (keyword.equalsIgnoreCase("SEROK")) { // received response to search request
+
+                int numberOfFiles = Integer.parseInt(st.nextToken());
+                if (numberOfFiles > 0) {
+                    String locatedIp = st.nextToken(); // ip of the node which has the file
+                    int locatedPort = Integer.parseInt(st.nextToken());
+                    int hops = Integer.parseInt(st.nextToken());
+
+                    while (st.hasMoreTokens()) {
+                        String msg = "File found: " + st.nextToken() + " in " + locatedIp;
+                        System.out.println(msg);
+                        gui.textAreaResults.append(msg);
+                    }
+                } else {
+                    switch (numberOfFiles) {
+                        case 0:
+                            System.out.println("file not found in node");
+                            gui.textAreaResults.append("file not found in node");
+                            break;
+                        case 9999: // failure due to node unreachable
+                            break;
+                        case 9998: // some other error
+                            break;
+                    }
+                }
+
             }
 
         } catch (NoSuchElementException e) {
@@ -252,7 +275,6 @@ public class Node {
                         break;
 
                     // even though the sever sends multiple neighbours (due to a bug in server), first 2 are taken
-
                     case "4":
                     case "5":
                     case "6":
@@ -284,6 +306,7 @@ public class Node {
                             System.out.println("neighbour added from BS. " + n.ipAddress + " " + n.port);
                         }
                         break;
+
                     case "2": // request is successful, 2 nodes' contacts will be returned
                         Neighbour n2 = new Neighbour(st.nextToken(), Integer.parseInt(st.nextToken()));
                         st.nextToken(); // username

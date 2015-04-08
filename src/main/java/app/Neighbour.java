@@ -1,18 +1,16 @@
 package app;
 
-import webservice.FileService;
 import webservice.FileServiceInterface;
+
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Created by Tharindu Wijewardane on 2015-03-06.
  */
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-
 public class Neighbour {
-
     public Neighbour() {
     }
 
@@ -37,10 +35,6 @@ public class Neighbour {
         return false;
     }
 
-    /**
-     *
-     * @return file service interface for the remote node
-     */
     public FileServiceInterface getFileService(){
         URL url = null;
         try {

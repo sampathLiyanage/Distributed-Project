@@ -1,8 +1,5 @@
 package app;
 
-import app.Neighbour;
-import app.Node;
-
 import java.util.ArrayList;
 
 /**
@@ -10,12 +7,13 @@ import java.util.ArrayList;
  */
 public class Util {
 
-    public static final String IP = "127.0.0.1"; // my ip address
-    public static final int PORT = 9903; // my port; Make sure the next port is free
-    public static final String USERNAME = "c"; // my username
+    static GUI gui;
+    public static String IP = "10.8.108.147"; // my ip address
+    public static int PORT = 9901; // my port
+    public static String USERNAME = "abc"; // my username
 
-    public static final String BS_IP = "127.0.0.1";
-    public static final int BS_PORT = 9900;
+    public static String BS_IP = "10.8.108.147";
+    public static int BS_PORT = 9900;
 
     static ArrayList<String> allFiles = new ArrayList<String>();
 
@@ -60,6 +58,7 @@ public class Util {
      */
     public static synchronized void addNeighbour(Neighbour n) {
         Node.neighbours.add(n);
+        gui.refreshNeighbourList();
     }
 
     /**
@@ -69,6 +68,7 @@ public class Util {
      */
     public static synchronized void removeNeighbour(Neighbour n) {
         Node.neighbours.remove(n);
+        gui.refreshNeighbourList();
     }
 
 }

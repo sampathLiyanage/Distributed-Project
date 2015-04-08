@@ -5,9 +5,8 @@ package webservice;
  */
 
 import app.Neighbour;
-import app.NodeSender;
-import app.Util;
 import app.Node;
+import app.Util;
 
 import javax.jws.WebService;
 import java.util.HashSet;
@@ -46,6 +45,8 @@ public class FileService implements FileServiceInterface {
 
     @Override
     public void fileFound(int numberOfFiles, String fileString, String ownerIp, int ownerPort) {
-                System.out.println("Files found: " + fileString + " (in " + ownerIp + ":" + ownerPort+")");
+                String output = "Files found: " + fileString + " (in " + ownerIp + ":" + ownerPort+")";
+                System.out.println(output);
+                Node.gui.textAreaResults.append(output);
     }
 }
