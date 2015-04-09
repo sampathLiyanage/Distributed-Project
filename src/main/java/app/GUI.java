@@ -1,5 +1,7 @@
 package app;
 
+import webservice.FileServicePublisher;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -65,6 +67,11 @@ public class GUI {
                 } catch (SocketException e1) {
                     e1.printStackTrace();
                 }
+                
+                //publish service
+                FileServicePublisher fsp = new FileServicePublisher();
+                fsp.publish();
+
                 Node.registerWithBS();
 
                 refreshNeighbourList();
