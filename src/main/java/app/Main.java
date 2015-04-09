@@ -15,14 +15,10 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
-                try {
-                    //publish service
-                    FileServicePublisher fsp = new FileServicePublisher();
-                    fsp.publish();
-                    GUI.init();
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                }
+                //publish service
+                FileServicePublisher fsp = new FileServicePublisher();
+                fsp.publish();
+                GUI.init();
             }
         });
 

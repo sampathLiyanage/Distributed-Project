@@ -60,7 +60,11 @@ public class GUI {
                 textFieldMyIp.setEnabled(false);
                 textFieldMyPort.setEnabled(false);
                 textFieldMyUsername.setEnabled(false);
-
+                try {
+                    myUDPSocket = new DatagramSocket(Util.PORT);
+                } catch (SocketException e1) {
+                    e1.printStackTrace();
+                }
                 Node.registerWithBS();
 
                 refreshNeighbourList();
@@ -123,7 +127,7 @@ public class GUI {
         }
     }
 
-    public static void init() throws SocketException {
+    public static void init(){
 
 //        try {
 //            UIManager.setLookAndFeel(new SyntheticaBlackStarLookAndFeel());
@@ -141,7 +145,7 @@ public class GUI {
 
         frame.setVisible(true);
 
-        myUDPSocket = new DatagramSocket(Util.PORT); //the port used for all UDP communication
+        //myUDPSocket = new DatagramSocket(Util.PORT); //the port used for all UDP communication
     }
 
 }

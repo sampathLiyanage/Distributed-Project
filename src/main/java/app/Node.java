@@ -27,7 +27,7 @@ public class Node {
      * @param query
      * @return
      */
-    public static boolean checkInRecentQueries(String query) {
+    public static boolean checkInRecentQueries(final String query) {
 
         if (recentSearchQueries.contains(query)) {
             return true;
@@ -128,7 +128,7 @@ public class Node {
      *
      * @param myUDPSocket
      */
-    static void joinDistributedSystem(DatagramSocket myUDPSocket) {
+    static void joinDistributedSystem(final DatagramSocket myUDPSocket) {
 
         receiver = new Thread() {
             @Override
