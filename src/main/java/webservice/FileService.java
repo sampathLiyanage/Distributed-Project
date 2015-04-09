@@ -45,7 +45,7 @@ public class FileService implements FileServiceInterface {
 
     @Override
     public void fileFound(int numberOfFiles, String fileString, String ownerIp, int ownerPort) {
-                String output = "Files found: " + fileString + " (in " + ownerIp + ":" + ownerPort+")";
+                String output = "Files found: " + fileString + " (in " + ownerIp + ":" + ownerPort+")\n";
                 System.out.println(output);
                 Node.gui.textAreaResults.append(output);
     }

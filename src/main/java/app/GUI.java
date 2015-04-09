@@ -63,24 +63,22 @@ public class GUI {
                 textFieldMyPort.setEnabled(false);
                 textFieldMyUsername.setEnabled(false);
                 try {
-                    myUDPSocket = new DatagramSocket(Util.PORT);
+                    //publish file service
+                    FileServicePublisher.publish();
+                    if (myUDPSocket == null)
+                        myUDPSocket = new DatagramSocket(Util.PORT);
+                    Node.registerWithBS();
+
+                    refreshNeighbourList();
+
+                    Node.joinDistributedSystem(myUDPSocket);
+
+                    joinButton.setEnabled(false);
+                    leaveButton.setEnabled(true);
+                    searchButton.setEnabled(true);
                 } catch (SocketException e1) {
                     e1.printStackTrace();
                 }
-                
-                //publish service
-                FileServicePublisher fsp = new FileServicePublisher();
-                fsp.publish();
-
-                Node.registerWithBS();
-
-                refreshNeighbourList();
-
-                Node.joinDistributedSystem(myUDPSocket);
-
-                joinButton.setEnabled(false);
-                leaveButton.setEnabled(true);
-                searchButton.setEnabled(true);
             }
         });
         leaveButton.addActionListener(new ActionListener() {
@@ -88,7 +86,6 @@ public class GUI {
             public void actionPerformed(ActionEvent e) {
                 Node.leaveDistributedSystem(myUDPSocket);
                 Node.unregisterFromBS();
-
                 joinButton.setEnabled(true);
                 leaveButton.setEnabled(false);
                 searchButton.setEnabled(false);
@@ -124,7 +121,6 @@ public class GUI {
         searchButton.setEnabled(false);
 
         Node.gui = this;
-        Util.gui = this;
     }
 
     void refreshNeighbourList(){
@@ -152,7 +148,6 @@ public class GUI {
 
         frame.setVisible(true);
 
-        //myUDPSocket = new DatagramSocket(Util.PORT); //the port used for all UDP communication
     }
 
 }
